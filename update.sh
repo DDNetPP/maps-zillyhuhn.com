@@ -8,7 +8,9 @@ then
 	exit 1
 fi
 
-cd /var/www/html/maps || exit 1
+
+mkdir -p public
+cd public || exit 1
 
 if [ -f BlmapChill.map ]
 then
