@@ -24,6 +24,24 @@ then
 	git submodule update --init --recursive
 fi
 
+update_repo() {
+	local folder="$1"
+	local branch="${2:-master}"
+	if [ ! -d "$folder/.git" ]
+	then
+		pushd "$folder" || exit 1
+		echo "[*] updating $folder ..."
+		git checkout "$branch"
+		git pull
+		popd || exit 1
+		git add "$folder" && git commit -m "Auto update submodule $folder" && git push
+	fi
+}
+
+git pull
+
+update_repo maps-scripts
+
 function hash_map() {
 	local map="$1"
 	local mapname
