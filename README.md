@@ -9,7 +9,7 @@ cd maps-zillyhuhn.com
 ./update.sh # setup submodules and generate maps
 ```
 
-The serve the newly created ``public/`` folder with your favorite web server
+Then serve the newly created ``public/`` folder with your favorite web server
 
 To keep updating every 5 minutes run
 ```
