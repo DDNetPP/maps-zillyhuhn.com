@@ -46,14 +46,6 @@ update_all_git() {
 	popd || exit 1
 }
 
-mkdir -p public
-cd public || exit 1
-
-if [ -f BlmapChill.map ]
-then
-	rm BlmapChill.map
-fi
-
 function hash_map() {
 	local map="$1"
 	local mapname
@@ -75,17 +67,30 @@ function hash_map() {
 	fi
 	update_all_git
 	echo "[*] adding '$map'"
-	echo "[*]   generating dark theme ..."
-	"$SCRIPT_PATH/maps-scripts/$mapname/dark.py" "$map" "${mapname}_dark.map"
-	echo "[*]   $outfile"
-	mv "$map" "$outfile"
-	checksum="$(sha256sum "${mapname}_dark.map" | cut -d' ' -f1)"
-	outfile="${mapname}_dark_$checksum.map"
-	echo "[*]   $outfile"
-	mv "${mapname}_dark.map" "$outfile"
+	local theme
+	for theme in "$SCRIPT_PATH/maps-scripts/$mapname"/*.py
+	do
+		theme="$(basename "$theme" .py)"
+		echo "[*]   generating $theme theme ..."
+		"$SCRIPT_PATH/maps-scripts/$mapname/$theme.py" "$map" "${mapname}_${theme}.map"
+		echo "[*]   $outfile"
+		mv "$map" "$outfile"
+		checksum="$(sha256sum "${mapname}_${theme}.map" | cut -d' ' -f1)"
+		outfile="${mapname}_${theme}_$checksum.map"
+		echo "[*]   $outfile"
+		mv "${mapname}_${theme}.map" "$outfile"
+	done
 }
 
-wget -q https://github.com/DDNetPP/maps/raw/master/BlmapChill.map 
-hash_map BlmapChill.map
+all_maps=(BlmapChill)
 
+mkdir -p public
+cd public || exit 1
+
+for map in "${all_maps[@]}"
+do
+	[[ -f "$map".map ]] && rm "$map".map
+	wget -q "https://github.com/DDNetPP/maps/raw/master/$map.map"
+	hash_map "$map".map
+done
 
