@@ -9,14 +9,6 @@ then
 fi
 
 
-mkdir -p public
-cd public || exit 1
-
-if [ -f BlmapChill.map ]
-then
-	rm BlmapChill.map
-fi
-
 if [ ! -d maps-scripts/BlmapChill ]
 then
 	echo "[!] Warning: no BlmapChill/ found in maps-scripts"
@@ -41,6 +33,14 @@ update_repo() {
 git pull
 
 update_repo maps-scripts
+
+mkdir -p public
+cd public || exit 1
+
+if [ -f BlmapChill.map ]
+then
+	rm BlmapChill.map
+fi
 
 function hash_map() {
 	local map="$1"
