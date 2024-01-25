@@ -30,9 +30,14 @@ update_repo() {
 	fi
 }
 
-git pull
+update_all_git() {
+	pushd "$SCRIPT_PATH" || exit 1
 
-update_repo maps-scripts
+	git pull
+	update_repo maps-scripts
+
+	popd || exit 1
+}
 
 mkdir -p public
 cd public || exit 1
@@ -61,9 +66,10 @@ function hash_map() {
 		rm "$map"
 		return
 	fi
+	update_all_git
 	echo "[*] adding '$map'"
 	echo "[*]   generating dark theme ..."
-	"$SCRIPT_PATH/maps-scripts/BlmapChill/dark.py" "$map" "${mapname}_dark.map"
+	"$SCRIPT_PATH/maps-scripts/$mapname/dark.py" "$map" "${mapname}_dark.map"
 	echo "[*]   $outfile"
 	mv "$map" "$outfile"
 	checksum="$(sha256sum "${mapname}_dark.map" | cut -d' ' -f1)"
