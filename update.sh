@@ -68,18 +68,29 @@ function hash_map() {
 	update_all_git
 	echo "[*] adding '$map'"
 	local theme
+	local theme_outfile
 	for theme in "$SCRIPT_PATH/maps-scripts/$mapname"/*.py
 	do
 		theme="$(basename "$theme" .py)"
-		echo "[*]   generating $theme theme ..."
+		echo "[*]   generating python $theme theme ..."
 		"$SCRIPT_PATH/maps-scripts/$mapname/$theme.py" "$map" "${mapname}_${theme}.map"
-		echo "[*]   $outfile"
-		mv "$map" "$outfile"
 		checksum="$(sha256sum "${mapname}_${theme}.map" | cut -d' ' -f1)"
-		outfile="${mapname}_${theme}_$checksum.map"
-		echo "[*]   $outfile"
-		mv "${mapname}_${theme}.map" "$outfile"
+		theme_outfile="${mapname}_${theme}_$checksum.map"
+		echo "[*]   $theme_outfile"
+		mv "${mapname}_${theme}.map" "$theme_outfile"
 	done
+	for theme in "$SCRIPT_PATH/maps-themes/$mapname"/*.map
+	do
+		local theme_fullpath="$theme"
+		theme="$(basename "$theme" .map)"
+		echo "[*]   generating $theme.map theme sha1sums ..."
+		checksum="$(sha256sum "$theme_fullpath" | cut -d' ' -f1)"
+		theme_outfile="${mapname}_${theme}_$checksum.map"
+		echo "[*]   $theme_outfile"
+		cp "$theme_fullpath" "$theme_outfile"
+	done
+	echo "[*]   $outfile"
+	mv "$map" "$outfile"
 }
 
 all_maps=(BlmapChill)
