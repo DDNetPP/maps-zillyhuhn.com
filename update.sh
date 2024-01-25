@@ -17,6 +17,13 @@ then
 	rm BlmapChill.map
 fi
 
+if [ ! -d maps-scripts/BlmapChill ]
+then
+	echo "[!] Warning: no BlmapChill/ found in maps-scripts"
+	echo "[!]          trying to load submodule"
+	git submodule update --init --recursive
+fi
+
 function hash_map() {
 	local map="$1"
 	local mapname
