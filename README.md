@@ -10,3 +10,8 @@ cd maps-zillyhuhn.com
 ```
 
 The serve the newly created ``public/`` folder with your favorite web server
+
+To keep updating every 5 minutes run
+```
+./maps-zillyhuhn.com.sh
+```
