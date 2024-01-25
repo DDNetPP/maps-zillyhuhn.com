@@ -15,6 +15,12 @@ then
 	echo "[!]          trying to load submodule"
 	git submodule update --init --recursive
 fi
+if [ ! -d maps-themes/BlmapChill ]
+then
+	echo "[!] Warning: no BlmapChill/ found in maps-themes"
+	echo "[!]          trying to load submodule"
+	git submodule update --init --recursive
+fi
 
 update_repo() {
 	local folder="$1"
@@ -35,6 +41,7 @@ update_all_git() {
 
 	git pull
 	update_repo maps-scripts
+	update_repo maps-themes
 
 	popd || exit 1
 }

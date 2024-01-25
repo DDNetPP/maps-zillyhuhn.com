@@ -1,3 +1,6 @@
 [submodule "maps-scripts"]
 	path = maps-scripts
 	url = https://github.com/DDNetPP/maps-scripts.git
+[submodule "maps-themes"]
+	path = maps-themes
+	url = git@github.com:fddrace/maps-themes.git
