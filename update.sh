@@ -69,11 +69,11 @@ function hash_map() {
 	echo "[*] adding '$map'"
 	local theme
 	local theme_outfile
-	for theme in "$SCRIPT_PATH/maps-scripts/$mapname"/*.py
+	for theme in "$SCRIPT_PATH/maps-scripts/$mapname"/themes/*.py
 	do
 		theme="$(basename "$theme" .py)"
 		echo "[*]   generating python $theme theme ..."
-		"$SCRIPT_PATH/maps-scripts/$mapname/$theme.py" "$map" "${mapname}_${theme}.map"
+		"$SCRIPT_PATH/maps-scripts/$mapname/themes/$theme.py" "$map" "${mapname}_${theme}.map"
 		checksum="$(sha256sum "${mapname}_${theme}.map" | cut -d' ' -f1)"
 		theme_outfile="${mapname}_${theme}_$checksum.map"
 		echo "[*]   $theme_outfile"
