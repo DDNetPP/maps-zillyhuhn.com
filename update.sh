@@ -8,6 +8,8 @@ then
 	exit 1
 fi
 
+NEW_MAPS_SCRIPTS=0
+NEW_MAPS_THEMES=0
 
 if [ ! -d maps-scripts/BlmapChill ]
 then
@@ -23,27 +25,81 @@ then
 fi
 
 update_repo() {
+	# if update_repo maps-scripts
+	# then
+	# 	echo "got new commits"
+	# fi
 	local folder="$1"
 	local branch="${2:-master}"
+	local commit_pre_pull=''
+	local commit_post_pull=''
+	pushd "$SCRIPT_PATH" || exit 1
 	if [ ! -d "$folder/.git" ]
 	then
 		pushd "$folder" || exit 1
 		echo "[*] updating $folder ..."
 		git checkout "$branch"
+		commit_pre_pull="$(git rev-parse HEAD)"
 		git pull
+		commit_post_pull="$(git rev-parse HEAD)"
 		popd || exit 1
 		git add "$folder" && git commit -m "Auto update submodule $folder" && git push
 	fi
+	popd || exit 1 # SCRIPT_PATH
+
+	if [ "$commit_pre_pull" != "$commit_post_pull" ]
+	then
+		return 0
+	fi
+	return 1
 }
 
 update_all_git() {
 	pushd "$SCRIPT_PATH" || exit 1
 
 	git pull
-	update_repo maps-scripts
-	update_repo maps-themes
+	update_repo maps-scripts && NEW_MAPS_SCRIPTS=1
+	update_repo maps-themes && NEW_MAPS_THEMES=1
 
 	popd || exit 1
+}
+
+update_maps_scripts() {
+	local map="$1"
+	# skip generate if there are no new commits
+	[[ "$NEW_MAPS_SCRIPTS" == "1" ]] || return
+
+	local theme
+	local theme_outfile
+	for theme in "$SCRIPT_PATH/maps-scripts/$mapname"/themes/*.py
+	do
+		theme="$(basename "$theme" .py)"
+		echo "[*]   generating python $theme theme ..."
+		"$SCRIPT_PATH/maps-scripts/$mapname/themes/$theme.py" "$map" "${mapname}_${theme}.map"
+		checksum="$(sha256sum "${mapname}_${theme}.map" | cut -d' ' -f1)"
+		theme_outfile="${mapname}_${theme}_$checksum.map"
+		echo "[*]   $theme_outfile"
+		mv "${mapname}_${theme}.map" "$theme_outfile"
+	done
+}
+
+update_maps_themes() {
+	local map="$1"
+	# skip generate if there are no new commits
+	[[ "$NEW_MAPS_THEMES" == "1" ]] || return
+
+	local theme
+	local theme_outfile
+	for theme in "$SCRIPT_PATH/maps-themes/$mapname"/*.map
+	do
+		local theme_fullpath="$theme"
+		theme="$(basename "$theme" .map)"
+		echo "[*]   generating $theme.map theme sha1sums ..."
+		checksum="$(sha256sum "$theme_fullpath" | cut -d' ' -f1)"
+		theme_outfile="${mapname}_${theme}_$checksum.map"
+		echo "[*]   $theme_outfile"
+		cp "$theme_fullpath" "$theme_outfile"
+	done
 }
 
 function hash_map() {
@@ -59,41 +115,27 @@ function hash_map() {
 	mapname="$(basename "$map" .map)"
 	checksum="$(sha256sum "$map" | cut -d' ' -f1)"
 	outfile="${mapname}_$checksum.map"
-	if [ -f "$outfile" ]
-	then
-		echo "[*] already got '$outfile'"
-		rm "$map"
-		return
-	fi
 	update_all_git
 	echo "[*] adding '$map'"
-	local theme
-	local theme_outfile
-	for theme in "$SCRIPT_PATH/maps-scripts/$mapname"/themes/*.py
-	do
-		theme="$(basename "$theme" .py)"
-		echo "[*]   generating python $theme theme ..."
-		"$SCRIPT_PATH/maps-scripts/$mapname/themes/$theme.py" "$map" "${mapname}_${theme}.map"
-		checksum="$(sha256sum "${mapname}_${theme}.map" | cut -d' ' -f1)"
-		theme_outfile="${mapname}_${theme}_$checksum.map"
-		echo "[*]   $theme_outfile"
-		mv "${mapname}_${theme}.map" "$theme_outfile"
-	done
-	for theme in "$SCRIPT_PATH/maps-themes/$mapname"/*.map
-	do
-		local theme_fullpath="$theme"
-		theme="$(basename "$theme" .map)"
-		echo "[*]   generating $theme.map theme sha1sums ..."
-		checksum="$(sha256sum "$theme_fullpath" | cut -d' ' -f1)"
-		theme_outfile="${mapname}_${theme}_$checksum.map"
-		echo "[*]   $theme_outfile"
-		cp "$theme_fullpath" "$theme_outfile"
-	done
-	echo "[*]   $outfile"
+	update_maps_scripts "$map"
+	update_maps_themes "$map"
+	if [ -f "$outfile" ]
+	then
+		echo "[*]   already got '$outfile'"
+	else
+		echo "[*]   adding new '$outfile'"
+	fi
 	mv "$map" "$outfile"
 }
 
 all_maps=(BlmapChill)
+
+if [ ! -d public ]
+then
+	# force refresh all on first run
+	NEW_MAPS_SCRIPTS=1
+	NEW_MAPS_THEMES=1
+fi
 
 mkdir -p public
 cd public || exit 1
