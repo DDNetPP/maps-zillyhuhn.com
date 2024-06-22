@@ -94,7 +94,7 @@ update_maps_themes() {
 	do
 		local theme_fullpath="$theme"
 		theme="$(basename "$theme" .map)"
-		echo "[*]   generating $theme.map theme sha1sums ..."
+		echo "[*]   generating $theme.map theme sha256sums ..."
 		checksum="$(sha256sum "$theme_fullpath" | cut -d' ' -f1)"
 		theme_outfile="${mapname}_${theme}_$checksum.map"
 		echo "[*]   $theme_outfile"
