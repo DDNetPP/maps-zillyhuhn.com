@@ -128,7 +128,10 @@ function hash_map() {
 	mv "$map" "$outfile"
 }
 
-all_maps=(BlmapChill)
+all_maps=(
+	BlmapChill
+	blmapV3multistarbox
+)
 
 if [ ! -d public ]
 then
