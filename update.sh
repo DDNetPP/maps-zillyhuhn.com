@@ -92,7 +92,7 @@ update_maps_themes() {
 	# skip generate if there are no new commits
 	[[ "$NEW_MAPS_THEMES" == "1" ]] || return
 
-	# generate themes based on themes
+	echo "[*]   generate themes based on .map themes ..."
 	pushd "$SCRIPT_PATH/maps-themes" || exit 1
 	git pull
 	./update.sh || exit 1
@@ -101,6 +101,7 @@ update_maps_themes() {
 	git push
 	popd || exit 1
 
+	echo "[*]   generate .map file themes sha sums ..."
 	local theme
 	local theme_outfile
 	for theme in "$SCRIPT_PATH/maps-themes/$mapname"/*.map
