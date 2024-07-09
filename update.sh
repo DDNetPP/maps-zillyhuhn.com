@@ -95,7 +95,7 @@ update_maps_themes() {
 	echo "[*]   generate themes based on .map themes ..."
 	pushd "$SCRIPT_PATH/maps-themes" || exit 1
 	git pull
-	./update.sh || exit 1
+	./generate.sh || exit 1
 	git add .
 	git commit -m "generate themes"
 	git push
