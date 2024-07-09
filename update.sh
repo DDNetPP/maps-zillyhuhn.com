@@ -11,6 +11,8 @@ fi
 NEW_MAPS_SCRIPTS=0
 NEW_MAPS_THEMES=0
 
+python3 -c "import twmap" || exit 1
+
 if [ ! -d maps-scripts/BlmapChill ]
 then
 	echo "[!] Warning: no BlmapChill/ found in maps-scripts"
