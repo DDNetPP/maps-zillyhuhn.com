@@ -73,6 +73,8 @@ update_maps_scripts() {
 	local theme_outfile
 	for theme in "$SCRIPT_PATH/maps-scripts/$mapname"/themes/*.py
 	do
+		[ -f "$theme" ] || continue
+
 		theme="$(basename "$theme" .py)"
 		echo "[*]   generating python $theme theme ..."
 		"$SCRIPT_PATH/maps-scripts/$mapname/themes/$theme.py" "$map" "${mapname}_${theme}.map"
@@ -101,6 +103,8 @@ update_maps_themes() {
 	local theme_outfile
 	for theme in "$SCRIPT_PATH/maps-themes/$mapname"/*.map
 	do
+		[ -f "$theme" ] || continue
+
 		local theme_fullpath="$theme"
 		theme="$(basename "$theme" .map)"
 		echo "[*]   generating $theme.map theme sha256sums ..."
