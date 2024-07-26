@@ -4,3 +4,6 @@
 [submodule "maps-themes"]
 	path = maps-themes
 	url = git@github.com:fddrace/maps-themes.git
+[submodule "http-maps"]
+	path = http-maps
+	url = git@github.com:fddrace/http-maps.git

@@ -25,6 +25,12 @@ then
 	echo "[!]          trying to load submodule"
 	git submodule update --init --recursive
 fi
+if [ ! -f http-maps/README.md ]
+then
+	echo "[!] Warning: no README.md found in http-maps"
+	echo "[!]          trying to load submodule"
+	git submodule update --init --recursive
+fi
 
 update_repo() {
 	# if update_repo maps-scripts
@@ -118,6 +124,16 @@ update_maps_themes() {
 	done
 }
 
+update_http_maps() {
+	local map
+	for map in "$SCRIPT_PATH"/http-maps/*.map
+	do
+		[ -f "$map" ] || continue
+
+		hash_map "$map"
+	done
+}
+
 function hash_map() {
 	local map="$1"
 	local mapname
@@ -131,17 +147,14 @@ function hash_map() {
 	mapname="$(basename "$map" .map)"
 	checksum="$(sha256sum "$map" | cut -d' ' -f1)"
 	outfile="${mapname}_$checksum.map"
-	update_all_git
 	echo "[*] adding '$map'"
-	update_maps_scripts "$map"
-	update_maps_themes "$map"
 	if [ -f "$outfile" ]
 	then
 		echo "[*]   already got '$outfile'"
 	else
 		echo "[*]   adding new '$outfile'"
 	fi
-	mv "$map" "$outfile"
+	cp "$map" "$outfile"
 }
 
 all_maps=(
@@ -159,10 +172,17 @@ fi
 mkdir -p public
 cd public || exit 1
 
+update_all_git
+
 for map in "${all_maps[@]}"
 do
 	[[ -f "$map".map ]] && rm "$map".map
 	wget -q "https://github.com/DDNetPP/maps/raw/master/$map.map"
+
 	hash_map "$map".map
+	update_maps_scripts "$map"
+	update_maps_themes "$map"
+
+	rm "$map".map
 done
 
