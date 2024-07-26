@@ -177,6 +177,7 @@ mkdir -p public
 cd public || exit 1
 
 update_all_git
+update_http_maps
 
 for map in "${all_maps[@]}"
 do
