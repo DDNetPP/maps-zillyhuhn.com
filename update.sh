@@ -10,6 +10,7 @@ fi
 
 NEW_MAPS_SCRIPTS=0
 NEW_MAPS_THEMES=0
+NEW_MAPS_HTTP=0
 
 python3 -c "import twmap" || exit 1
 
@@ -68,6 +69,7 @@ update_all_git() {
 	git pull
 	update_repo maps-scripts && NEW_MAPS_SCRIPTS=1
 	update_repo maps-themes && NEW_MAPS_THEMES=1
+	update_repo http-maps && NEW_MAPS_HTTP=1
 
 	popd || exit 1
 }
@@ -125,6 +127,8 @@ update_maps_themes() {
 }
 
 update_http_maps() {
+	[[ "$NEW_MAPS_HTTP" == "1" ]] || return
+
 	local map
 	for map in "$SCRIPT_PATH"/http-maps/*.map
 	do
