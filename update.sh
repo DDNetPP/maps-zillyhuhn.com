@@ -87,7 +87,7 @@ update_maps_scripts() {
 
 		theme="$(basename "$theme" .py)"
 		echo "[*]   generating python $theme theme ..."
-		"$SCRIPT_PATH/maps-scripts/$mapname/themes/$theme.py" "$mapname" "${mapname}_${theme}.map"
+		"$SCRIPT_PATH/maps-scripts/$mapname/themes/$theme.py" "$mapname.map" "${mapname}_${theme}.map"
 		checksum="$(sha256sum "${mapname}_${theme}.map" | cut -d' ' -f1)"
 		theme_outfile="${mapname}_${theme}_$checksum.map"
 		echo "[*]   $theme_outfile"
