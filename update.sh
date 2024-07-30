@@ -171,6 +171,7 @@ then
 	# force refresh all on first run
 	NEW_MAPS_SCRIPTS=1
 	NEW_MAPS_THEMES=1
+	NEW_MAPS_HTTP=1
 fi
 
 mkdir -p public
