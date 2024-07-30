@@ -75,7 +75,7 @@ update_all_git() {
 }
 
 update_maps_scripts() {
-	local map="$1"
+	local mapname="$1"
 	# skip generate if there are no new commits
 	[[ "$NEW_MAPS_SCRIPTS" == "1" ]] || return
 
@@ -96,7 +96,7 @@ update_maps_scripts() {
 }
 
 update_maps_themes() {
-	local map="$1"
+	local mapname="$1"
 	# skip generate if there are no new commits
 	[[ "$NEW_MAPS_THEMES" == "1" ]] || return
 
