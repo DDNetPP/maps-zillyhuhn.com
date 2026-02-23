@@ -12,6 +12,11 @@ NEW_MAPS_SCRIPTS=0
 NEW_MAPS_THEMES=0
 NEW_MAPS_HTTP=0
 
+if [ -f venv/bin/activate ]
+then
+	source venv/bin/activate
+fi
+
 python3 -c "import twmap" || exit 1
 
 if [ ! -d maps-scripts/BlmapChill ]
@@ -87,7 +92,7 @@ update_maps_scripts() {
 
 		theme="$(basename "$theme" .py)"
 		echo "[*]   generating python $theme theme ..."
-		"$SCRIPT_PATH/maps-scripts/$mapname/themes/$theme.py" "$mapname.map" "${mapname}_${theme}.map"
+		python3 "$SCRIPT_PATH/maps-scripts/$mapname/themes/$theme.py" "$mapname.map" "${mapname}_${theme}.map"
 		checksum="$(sha256sum "${mapname}_${theme}.map" | cut -d' ' -f1)"
 		theme_outfile="${mapname}_${theme}_$checksum.map"
 		echo "[*]   $theme_outfile"
