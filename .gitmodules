@@ -7,3 +7,6 @@
 [submodule "http-maps"]
 	path = http-maps
 	url = git@github.com:fddrace/http-maps.git
+[submodule "multiblock"]
+	path = multiblock
+	url = git@github.com:multiblock-ddnet/maps.git

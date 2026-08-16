@@ -11,6 +11,7 @@ fi
 NEW_MAPS_SCRIPTS=0
 NEW_MAPS_THEMES=0
 NEW_MAPS_HTTP=0
+NEW_MAPS_MULTI=0
 
 if [ -f venv/bin/activate ]
 then
@@ -34,6 +35,12 @@ fi
 if [ ! -f http-maps/README.md ]
 then
 	echo "[!] Warning: no README.md found in http-maps"
+	echo "[!]          trying to load submodule"
+	git submodule update --init --recursive
+fi
+if [ ! -f multiblock/README.md ]
+then
+	echo "[!] Warning: no README.md found in multiblock"
 	echo "[!]          trying to load submodule"
 	git submodule update --init --recursive
 fi
@@ -75,6 +82,7 @@ update_all_git() {
 	update_repo maps-scripts && NEW_MAPS_SCRIPTS=1
 	update_repo maps-themes && NEW_MAPS_THEMES=1
 	update_repo http-maps && NEW_MAPS_HTTP=1
+	update_repo multiblock && NEW_MAPS_MULTI=1
 
 	popd || exit 1
 }
@@ -143,6 +151,19 @@ update_http_maps() {
 	done
 }
 
+# TODO: merge this with http maps and make it more generic
+update_multi_maps() {
+	[[ "$NEW_MAPS_MULTI" == "1" ]] || return
+
+	local map
+	for map in "$SCRIPT_PATH"/multiblock/*.map
+	do
+		[ -f "$map" ] || continue
+
+		hash_map "$map"
+	done
+}
+
 function hash_map() {
 	local map="$1"
 	local mapname
@@ -177,6 +198,7 @@ then
 	NEW_MAPS_SCRIPTS=1
 	NEW_MAPS_THEMES=1
 	NEW_MAPS_HTTP=1
+	NEW_MAPS_MULTI=1
 fi
 
 mkdir -p public
@@ -184,6 +206,7 @@ cd public || exit 1
 
 update_all_git
 update_http_maps
+update_multi_maps
 
 for map in "${all_maps[@]}"
 do
